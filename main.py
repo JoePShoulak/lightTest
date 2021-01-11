@@ -106,7 +106,7 @@ def random_basic_color():
     return randrange(0, 15) * 16
 
 
-def smooth_rainbow(lights):
+def rainbow(lights):
     color = 0
     while not stop_loop:
         if color == 255:
@@ -165,7 +165,7 @@ def marquee(lights):
 
 
 animations = {
-    "smooth_rainbow": smooth_rainbow,
+    "rainbow": rainbow,
     "cross_faded": cross_faded,
     "marquee": marquee
 }
@@ -188,7 +188,8 @@ if __name__ == '__main__':
         if choice != -1:
             stop_loop = True
             sleep(1)
+            reset_lights(den_main)
             stop_loop = False
+            sleep(1)
 
-        reset_lights(lights)
         Thread(target=animations[list(animations.keys())[choice]], args=(den_main,), daemon=True).start()
