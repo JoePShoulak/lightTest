@@ -4,6 +4,7 @@ from tuyapy import *
 from time import sleep
 from random import randrange
 from threading import Thread
+import numpy
 
 global stop_loop
 stop_loop = False
@@ -30,6 +31,11 @@ den_main_ids = ["Den Main 1",
                 "Den Main 2",
                 "Den Main 3",
                 "Den Main 4"]
+
+
+def map_spectrum(color):
+    color[0] = int((numpy.arctan(color[0] / 45 - 4)/1.11/1.2 + 1) * 180)
+    return color
 
 
 def display_animation_options():
@@ -67,9 +73,9 @@ def set_lights_to_color(lights, color):
     threads = []
 
     if color == "white":
-        color = [0, 0, 100]
+        color = [0, 0, 1000]
     else:
-        color = [color, 100, 100]
+        color = [color, 1000, 1000]
     for light in lights:
         threads.append(Thread(target=set_light_color, args=(light, color,), daemon=True))
 
@@ -109,7 +115,7 @@ def random_basic_color():
 def rainbow(lights):
     color = 0
     while not stop_loop:
-        if color == 255:
+        if color == 360:
             color = 0
         else:
             color += 1
@@ -133,8 +139,8 @@ def cross_faded(lights):
             subset = half2
 
         new_color = random_basic_color()
-        if abs(new_color - old_color) < 64:
-            new_color = (new_color + 64) % 256
+        if abs(new_color - old_color) < 90:
+            new_color = (new_color + 90) % 360
 
         set_lights_to_color(subset, new_color)
         old_color = new_color
@@ -164,12 +170,30 @@ def marquee(lights):
         sleep(1)
 
 
+def nebula(lights):
+    color = 0
+
+    while not stop_loop:
+        threads = []
+        i = 0
+        for light in lights:
+            temp_color = map_spectrum([(color + (32*i)) % 256, 100, 100])
+            threads.append(Thread(target=set_light_color, args=(light, temp_color,)))
+            i += 1
+
+        for t in threads:
+            t.start()
+
+        color = (color + 2) % 360
+        sleep(0.2)
+
+
 animations = {
     "rainbow": rainbow,
     "cross_faded": cross_faded,
-    "marquee": marquee
+    "marquee": marquee,
+    "nebula": nebula
 }
-
 
 if __name__ == '__main__':
     USERNAME = 'joepshoulak@me.com'  # username (email) from the android app
