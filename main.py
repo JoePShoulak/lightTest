@@ -185,11 +185,10 @@ if __name__ == '__main__':
         display_animation_options()
         choice = int(input()) - 1
 
-        if choice != -1:
-            stop_loop = True
-            sleep(1)
-            reset_lights(den_main)
-            stop_loop = False
-            sleep(1)
+        stop_loop = True
+        sleep(1)
+        reset_lights(den_main)
+        stop_loop = False
+        sleep(1)
 
         Thread(target=animations[list(animations.keys())[choice]], args=(den_main,), daemon=True).start()
